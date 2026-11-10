@@ -1,115 +1,90 @@
 package tests;
 
+import java.util.HashMap;
+import java.util.List;
+
+import org.testng.Assert;
+import org.testng.annotations.Test;
+
 import com.jayway.jsonpath.JsonPath;
 import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.APIResponse;
 import com.microsoft.playwright.Playwright;
 import com.microsoft.playwright.options.RequestOptions;
-import org.testng.Assert;
-import org.testng.annotations.Test;
-
-import java.util.HashMap;
-import java.util.List;
 
 public class APITest {
 
-    @Test
-    public void e2eApiTest()
-    {
+        @Test
+        public void e2eAPITest() {
 
-        //Login
-        HashMap<Object,Object> loginPayload = new HashMap<>();
-        loginPayload.put("email","rahulshetty1@yahoo.com");
-        loginPayload.put("password","Magiclife1!");
+                // login API call
+                HashMap<Object, Object> data = new HashMap<>();
+                data.put("email", "trasky1508@gmail.com");
+                data.put("password", "Master#91X");
+                Playwright playwright = Playwright.create();
+                APIRequestContext requestContext = playwright.request().newContext();
+                APIResponse loginresponse = requestContext.post(
+                                "https://api.eventhub.rahulshettyacademy.com/api/auth/login",
+                                RequestOptions.create().setData(data));
+                Assert.assertTrue(loginresponse.ok());
 
+                String token = JsonPath.read(loginresponse.text(), "$.token");
+                System.out.println(token);
 
-        Playwright playwright =  Playwright.create();
-        APIRequestContext apiRequest =  playwright.request().newContext();
-        APIResponse loginResponse = apiRequest.post("https://api.eventhub.rahulshettyacademy.com/api/auth/login",
-                RequestOptions.create().setData(loginPayload));
-        Assert.assertTrue(loginResponse.ok());
-        System.out.println(loginResponse.text());
+                // create event API call
+                HashMap<Object, Object> eventdata = new HashMap<>();
+                eventdata.put("title", "Qa summit");
+                eventdata.put("description", "Qa summit description");
+                eventdata.put("category", "Conference");
+                eventdata.put("venue", "I don't know");
+                eventdata.put("city", "Bangalore");
+                eventdata.put("eventDate", "2026-11-25T03:35:00.000Z");
+                eventdata.put("price", 232);
+                eventdata.put("totalSeats", 2323);
 
-        String token = JsonPath.read(loginResponse.text(),"$.token");
-        System.out.println("Login success "+token);
+                APIResponse eventCreate = requestContext.post("https://api.eventhub.rahulshettyacademy.com/api/events",
+                                RequestOptions.create().setHeader("Authorization", "Bearer " + token)
+                                                .setData(eventdata));
 
-        //Create Event
-        String eventTitle = "Playwright API Testing";
-        HashMap<Object,Object> createEventPayload = new HashMap<>();
-        createEventPayload.put("title",eventTitle);
-        createEventPayload.put("description", "api");
-        createEventPayload.put("category", "Conference");
-        createEventPayload.put("venue", "Main road");
-        createEventPayload.put("city", "Bangalore");
-        createEventPayload.put("eventDate", "2026-07-16T05:41:00.000Z");
-        createEventPayload.put("price", 100);
-        createEventPayload.put("totalSeats", 500);
+                Assert.assertTrue(eventCreate.ok(), "Event creation successful");
 
+                String eventId = JsonPath.read(eventCreate.text(), "$.data.id").toString();
+                System.out.println("Event ID: " + eventId);
 
-        APIResponse eventResponse = apiRequest.post("https://api.eventhub.rahulshettyacademy.com/api/events",
-                RequestOptions.create().setHeader("Authorization", "Bearer "+token)
-                .setData(createEventPayload));
+                // Get all events API call
+                APIResponse allEventsResponse = requestContext
+                                .get("https://api.eventhub.rahulshettyacademy.com/api/events",
+                                                RequestOptions.create().setQueryParam("page", "1")
+                                                                .setQueryParam("limit", "12")
+                                                                .setHeader("Authorization", "Bearer " + token));
 
-        Assert.assertTrue(eventResponse.ok(), "Create Event API should succeed");
-        int eventId = JsonPath.read(eventResponse.text(),"$.data.id");
-        System.out.println("Event created and its ID is "+eventId);
+                Assert.assertTrue(allEventsResponse.ok(), "Get all events successful");
+                System.out.println("All Events Response: " + allEventsResponse.text());
 
-        //Get Event
-        APIResponse retrieveEvents = apiRequest.get("https://api.eventhub.rahulshettyacademy.com/api/events",
-                RequestOptions.create().setQueryParam("page","1").setQueryParam("limit","12")
-                        .setHeader("Authorization", "Bearer "+token));
+                List<Integer> allEventIds = JsonPath.read(allEventsResponse.text(), "$.data[*].id");
+                System.out.println("All Event IDs: " + allEventIds);
+                Assert.assertTrue(allEventIds.contains(Integer.parseInt(eventId)),
+                                "Created event ID " + eventId + " found in the list of all events");
 
-        Assert.assertTrue(retrieveEvents.ok(), " Event Retrieval API should succeed");
-        System.out.println(retrieveEvents.text());
+                // Delete event API call
+                APIResponse deleteEventResponse = requestContext.delete(
+                                "https://api.eventhub.rahulshettyacademy.com/api/events/" + eventId,
+                                RequestOptions.create().setHeader("Authorization", "Bearer " + token));
+                Assert.assertTrue(deleteEventResponse.ok(), "Event deletion successful");
 
-        List<Integer> allEventIds = JsonPath.read(retrieveEvents.text(),"$.data[*].id");
-        Assert.assertTrue(allEventIds.contains(eventId), "Created event should appear in events list");
+                // Verify event deletion by fetching all events again
+                 APIResponse afterDeleteEventsResponse = requestContext
+                                .get("https://api.eventhub.rahulshettyacademy.com/api/events",
+                                                RequestOptions.create().setQueryParam("page", "1")
+                                                                .setQueryParam("limit", "12")
+                                                                .setHeader("Authorization", "Bearer " + token));
 
-    //Delete event
+                Assert.assertTrue(afterDeleteEventsResponse.ok(), "Get all events successful");
+                System.out.println("All Events Response: " + afterDeleteEventsResponse.text());
 
-        APIResponse deleteResponse = apiRequest.delete("https://api.eventhub.rahulshettyacademy.com/api/events/"+eventId,
-                RequestOptions.create().setHeader("Authorization", "Bearer "+token));
-        Assert.assertTrue(deleteResponse.ok());
-
-     //Verify Deletion is success. ->GetEvents and confirm that event id does not exist anymore
-
-        APIResponse verifyRes = apiRequest.get("https://api.eventhub.rahulshettyacademy.com/api/events",
-                RequestOptions.create()
-                        .setHeader("Authorization", "Bearer " + token)
-                        .setQueryParam("page", "1")
-                        .setQueryParam("limit", "12"));
-        Assert.assertTrue(verifyRes.ok(), "Post-delete events list call should succeed");
-
-        List<String> idsAfterDelete = JsonPath.read(verifyRes.text(), "$.data[*].id");
-        Assert.assertFalse(idsAfterDelete.contains(eventId),
-                "Deleted event must no longer appear in the events list");
-        System.out.println("Deletion verified: event no longer in list.");
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    }
-
-
+                List<Integer> afterDeleteEventIds = JsonPath.read(afterDeleteEventsResponse.text(), "$.data[*].id");
+                System.out.println("All Event IDs: " + afterDeleteEventIds);
+                Assert.assertFalse(afterDeleteEventIds.contains(Integer.parseInt(eventId)),
+                                "Created event ID " + eventId + " not found in the list of all events");
+        }
 }

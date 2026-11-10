@@ -1,6 +1,8 @@
 package tests;
 
 import com.microsoft.playwright.*;
+import com.microsoft.playwright.assertions.LocatorAssertions;
+import com.microsoft.playwright.assertions.PlaywrightAssertions;
 import com.microsoft.playwright.options.AriaRole;
 import org.testng.Assert;
 import org.testng.annotations.AfterMethod;
@@ -23,8 +25,9 @@ public class BasicsTest {
         playwright = Playwright.create();
        browser=playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
         page = browser.newPage(); //browser.newContext();
-        page.setDefaultTimeout(5000);
+        page.setDefaultTimeout(8000);
         page.navigate("https://eventhub.rahulshettyacademy.com/login");
+        PlaywrightAssertions.setDefaultAssertionTimeout(7000); //Global Assertion time out 7 seconds
 
     }
 
@@ -46,8 +49,8 @@ public class BasicsTest {
        //Step 1 - Create Event from Admin page
 
        page.navigate("https://eventhub.rahulshettyacademy.com/admin/events");
-
-       page.locator("#event-title-input").fill("Rahul Shetty QA Summit");
+        //10 seconds - Actions
+       page.locator("#event-title-input").fill("Rahul Shetty QA Summit",new Locator.FillOptions().setTimeout(10000));
        page.locator("#admin-event-form textarea").fill("Rahul Shetty QA Meetups");
        page.getByLabel("Category").selectOption("Concert");
        page.getByLabel("City").fill("Test City");
@@ -55,10 +58,15 @@ public class BasicsTest {
        page.getByLabel("Event Date & Time").fill("2026-12-18T07:25");
        page.getByLabel("Price ($)").fill("100");
        page.getByLabel("Total Seats").fill("50");
-       page.locator("#add-event-btn").click();
+       page.locator("#add-event-btn").click(new Locator.ClickOptions().setTimeout(12000));
 
-       //Event created!
-       assertThat(page.getByText("Event created!")).isVisible();
+       //Event created! 2-3
+       assertThat(page.getByText("Event created!")).isVisible(); //5 seconds -Assertions
+
+
+
+
+
 
 
        //Step 2 - Find newly created event in the events page
@@ -68,7 +76,24 @@ public class BasicsTest {
         //Visibility of the card which we have added
        Locator targetCard =  eventCards.filter(new Locator.FilterOptions().setHasText("Rahul Shetty QA Summit"));
 
-       assertThat(targetCard).isVisible();
+       assertThat(targetCard).isVisible(new LocatorAssertions.IsVisibleOptions().setTimeout(10000));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
        String seatsText =  targetCard.getByText("seats").innerText();
        System.out.println(seatsText);
         int seatsNumBeforeBooking =Integer.parseInt(seatsText.split(" ")[0]);

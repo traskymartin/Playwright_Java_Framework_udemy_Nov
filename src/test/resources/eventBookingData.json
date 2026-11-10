@@ -2,6 +2,7 @@
   {
     "titlePrefix": "Tech Conference",
     "description": "Annual technology conference for developers",
+    "category": "Concert",
     "city": "Hyderabad",
     "venue": "HICC Convention Center",
     "dateTime": "2027-06-15T10:00",
@@ -14,6 +15,7 @@
   {
     "titlePrefix": "Music Festival",
     "description": "Live music festival with top artists",
+    "category": "Concert",
     "city": "Bangalore",
     "venue": "Palace Grounds",
     "dateTime": "2027-08-20T18:00",
@@ -21,6 +23,6 @@
     "totalSeats": "200",
     "fullName": "Test Automation User",
     "email": "automation.test@example.com",
-    "phone": "8765432109"
+    "phone": "9234234343"
   }
 ]

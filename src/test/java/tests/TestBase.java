@@ -1,48 +1,62 @@
 package tests;
 
-import com.microsoft.playwright.Browser;
-import com.microsoft.playwright.BrowserType;
-import com.microsoft.playwright.Page;
-import com.microsoft.playwright.Playwright;
+import com.microsoft.playwright.*;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Properties;
 
 public class TestBase {
+    public Page page;
+    public BrowserContext context;
+    public Browser browser;
+    private Playwright playwright;
+    public String base_URL;
 
-    Playwright playwright;
-    Browser browser;
-    Page page;
-    String base_url;
     @BeforeMethod(alwaysRun = true)
     public void setUp() throws IOException {
         Properties prop = new Properties();
-        FileInputStream fis = new FileInputStream("src/test/resources/config.properties");
-        prop.load(fis);
-        //mvn test -PFramework -Dbrowser=chrome -Denv=dev
-        //
-        String browserName = System.getProperty("browser")!=null ?System.getProperty("browser") :prop.getProperty("browser");
-        String envName = System.getProperty("env")!=null ?System.getProperty("env") :prop.getProperty("env");
-       // String browserName = prop.getProperty("browser");
+        try (FileInputStream fis = new FileInputStream("src/test/resources/config.properties")) {
+            prop.load(fis);
+        }
+        String browserName = System.getProperty("browser", prop.getProperty("browser", "chromium"));
         playwright = Playwright.create();
-
-        if("firefox".equals(browserName)) {
-           browser = playwright.firefox().launch();
-        }
-        else if ("safari".equals(browserName)) {
-            browser = playwright.webkit().launch();
+        BrowserType.LaunchOptions launchOptions = new BrowserType.LaunchOptions().setHeadless(false);
+        if (browserName.equalsIgnoreCase("chrome") || browserName.equalsIgnoreCase("chromium")) {
+            browser = playwright.chromium().launch(launchOptions);
+        } else if (browserName.equalsIgnoreCase("firefox")) {
+            browser = playwright.firefox().launch(launchOptions);
+        } else if (browserName.equalsIgnoreCase("webkit")) {
+            browser = playwright.webkit().launch(launchOptions);
         } else {
-           // browser=playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
-            browser=playwright.chromium().launch();
+            throw new IllegalArgumentException("Unsupported browser: " + browserName
+                    + ". Use chrome, chromium, firefox, or webkit.");
         }
-        page = browser.newPage(); //browser.newContext();
+        context = browser.newContext();
+        context.tracing().start(new Tracing.StartOptions()
+                .setScreenshots(true)
+                .setSnapshots(true)
+                .setSources(true));
+        page = context.newPage();
+
         page.setDefaultTimeout(5000);
-
-        base_url = prop.getProperty(envName+".base_url");
-
-
+        base_URL = prop.getProperty("qa.baseurl");
     }
 
+    @AfterMethod(alwaysRun = true)
+    public void tearDown() {
+        if (context != null) {
+            context.tracing().stop(new Tracing.StopOptions().setPath(Paths.get("trace.zip")));
+            context.close();
+        }
+        if (browser != null) {
+            browser.close();
+        }
+        if (playwright != null) {
+            playwright.close();
+        }
+    }
 }

@@ -13,62 +13,48 @@ import java.util.HashMap;
 import java.util.List;
 
 public class DataProviderDemoTest {
+    @DataProvider(name = "basicData") // multi Dimensional Array of objects
+    public Object[][] basicData() {
 
-//HashMap,
-    @DataProvider(name = "basicData") //Multi Dimensional array of objects
-    public Object[][] basicData()
-    {
-        return new Object[][] { {"user!@yaoo.com","password1"}, {"user!@gmail.com","password2"}};
+        return new Object[][]{{"user1@yahoo.com", "Password1"}, {"user2@yahoo.com", "Password2"}};
+
     }
-
 
     @Test(dataProvider = "basicData")
-    public void testFillForm(String email,String password)
-    {
-        System.out.println(email);
-        System.out.println(password);
-
+    public void testFillForm(String email, String password) {
+        System.out.println("Fill Form : " + email + " " + password);
     }
 
-    @DataProvider(name = "hashMapData") //Multi Dimensional array of objects
-    public Object[][] hashMapData()
-    {
+    @DataProvider(name = "hashMapData") // multi Dimensional Array of objects
+    public Object[][] hashMapData() {
         HashMap<String, String> user1 = new HashMap<>();
-        user1.put("email","user!@yaoo.com");
-        user1.put("password", "password1");
+        user1.put("email", "user1@yahoo.com");
+        user1.put("password", "Password1");
 
         HashMap<String, String> user2 = new HashMap<>();
-        user2.put("email","user!@gmail.com");
-        user2.put("password", "password2");
+        user2.put("email", "user2@yahoo.com");
+        user2.put("password", "Password2");
+        return new Object[][]{{user1}, {user2}};
 
-        return new Object[][] { {user1},{user2}};
     }
 
+    @Test(dataProvider = "jsonData")
+    public void testWithHashMap(HashMap<String, String> user) {
+        System.out.println(user.get("email"));
+        System.out.println(user.get("password"));
+
+    }
 
     @DataProvider(name = "jsonData")
     public Object[][] jsonData() throws IOException {
-        String jsonContent = new String(Files.readAllBytes(
-                Paths.get(System.getProperty("user.dir") + "/src/test/resources/testdata_TC1.json")));
-
-        Type type = new TypeToken<List<HashMap<String, String>>>() {}.getType();
+        String jsonContent = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + "/src/test/resources/testDataTC1.json")));
+        Type type = new TypeToken<List<HashMap<String, String>>>() {
+        }.getType();
         List<HashMap<String, String>> list = new Gson().fromJson(jsonContent, type);
-
-        Object[][] table = new Object[list.size()][1];
+        Object[][] data = new Object[list.size()][1];
         for (int i = 0; i < list.size(); i++) {
-            table[i][0] = list.get(i);
+            data[i][0] = list.get(i);
         }
-        return table;
+        return data;
     }
-
-
-
-    @Test(dataProvider ="jsonData")
-    public void testWithHashMap(HashMap<String,String> data)
-    {
-        System.out.println(data.get("email"));
-        System.out.println(data.get("password"));
-
-
-    }
-
 }

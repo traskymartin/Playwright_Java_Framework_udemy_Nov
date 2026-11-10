@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:allurereport.org)",
+      "Bash(mvn test *)",
+      "Bash(mvn clean *)",
+      "Bash(java -version)",
+      "Bash(/usr/libexec/java_home -V)",
+      "Bash(JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home mvn dependency:tree -PFramework)",
+      "Bash(JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home mvn clean test -PFramework -Dbrowser=chrome)",
+      "Bash(allure serve *)",
+      "Skill(claude-in-chrome)",
+      "Bash(JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home mvn test -PFramework -Dbrowser=chrome)",
+      "Bash(grep -v \"^\\\\[INFO\\\\] $\")",
+      "Bash(python3 -c \"import sys; content=sys.stdin.read\\(\\); print\\(content[:3000]\\)\")",
+      "Bash(JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk-17.jdk/Contents/Home mvn dependency:resolve-plugins -PFramework)",
+      "Bash(xattr -l /Users/rahulshetty/Library/Caches/ms-playwright/webkit_mac14_arm64_special-2251/pw_run.sh)",
+      "Bash(codesign -dv --verbose=4 \"/Users/rahulshetty/Library/Caches/ms-playwright/webkit_mac14_arm64_special-2251/Playwright.app\")",
+      "Bash(python3 *)",
+      "Bash(mvn -q dependency:build-classpath -Dmdep.outputFile=/tmp/cp.txt)",
+      "Bash(csrutil status *)",
+      "Bash(systemextensionsctl list *)",
+      "Bash(vm_stat)",
+      "Bash(sfltool dumpbtm *)",
+      "Bash(curl -s \"https://search.maven.org/solrsearch/select?q=g:com.microsoft.playwright+AND+a:playwright&core=gav&rows=5&wt=json\")",
+      "Bash(curl -s \"https://api.github.com/repos/microsoft/playwright-java/releases/latest\")"
+    ]
+  }
+}

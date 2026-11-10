@@ -3,37 +3,34 @@ package pages;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.AriaRole;
 
-import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
-
 public class LoginPage {
+    private Page page;
+    private String base_URL;
+    private static final String emailPlaceGolder = "you@email.com";
+    private static final String passwordPlaceGolder = "Password";
 
-    Page page;
-    String base_url;
-    private static final String email_placeHolder = "you@email.com";
-    private static final String password_label = "Password";
-
-    public LoginPage(Page page, String baseUrl)
-    {
-        this.page =page;
-        this.base_url = baseUrl;
-
+    public DashboardPage loginToApplication() {
+        return loginToEventManagmentApplication();
     }
 
-
-    public DashboardPage loginToApplication()
-    {
-        page.navigate(base_url);
-        System.out.println(page.title());
-        assertThat(page).hasTitle("EventHub — Discover & Book Events");
-        //page.getByLabel("Email").fill("rahulshetty1@yahoo.com");
-        page.getByPlaceholder(email_placeHolder).fill("rahulshetty1@yahoo.com");
-        page.getByLabel(password_label).fill("Magiclife1!");
-        //locator
-        page.getByRole(AriaRole.BUTTON,new Page.GetByRoleOptions().setName("Sign In")).click();
-        DashboardPage dashboardPage = new DashboardPage(page);
-        return dashboardPage;
+    public DashboardPage loginToApplication(String email, String password) {
+        return loginToEventManagmentApplication(email, password);
     }
 
+    public DashboardPage loginToEventManagmentApplication() {
+        return loginToEventManagmentApplication("trasky1508@gmail.com", "Master#91X");
+    }
 
+    public DashboardPage loginToEventManagmentApplication(String email, String password) {
+        page.navigate(base_URL);
+        page.getByPlaceholder(emailPlaceGolder).fill(email);
+        page.getByLabel(passwordPlaceGolder).fill(password);
+        page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Sign In")).click();
+        return new DashboardPage(page);
+    }
 
+    public LoginPage(Page page, String baseUrl) {
+        this.page = page;
+        this.base_URL = baseUrl;
+    }
 }

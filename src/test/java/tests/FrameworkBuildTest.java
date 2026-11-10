@@ -1,118 +1,55 @@
 package tests;
 
-import com.microsoft.playwright.*;
+import com.microsoft.playwright.Locator;
+import com.microsoft.playwright.Page;
+import com.microsoft.playwright.assertions.LocatorAssertions;
 import com.microsoft.playwright.options.AriaRole;
+
 import org.testng.Assert;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 import pages.*;
 
+import java.nio.file.Paths;
+
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
+public class FrameWorkBuildTest extends TestBase {
 
-public class FrameworkBuildTest extends TestBase{
-
-//Invoke browser ->Invoke tab/page->type url
-    //HeadMode- Headless
-
-
-    @Test(groups = {"framework"},description = "Create Event -Book that event and verify if its booked")
-    public void DemoTest()
-    {
+    @Test(description = " Create Event - Book that event and verify if its booked ")
+    public void demotest() throws InterruptedException {
+        ;
         String eventTitle = "Playwright Framework Test";
-
-        LoginPage loginPage = new LoginPage(page,base_url);
-        DashboardPage dashboardPage=loginPage.loginToApplication();
+        LoginPage loginPage = new LoginPage(page, base_URL);
+        DashboardPage dashboardPage = loginPage.loginToEventManagmentApplication();
         dashboardPage.waitForEventsToLoad();
         AdminEventsPage adminEventsPage = new AdminEventsPage(page);
         adminEventsPage.goTo();
-        //Step 1 - Create Event from Admin pageeventTitle
-        adminEventsPage.createEvent(
-                eventTitle,
-                "Playwright test event",
-                "Test City",
-                "Test Venue",
-                "2027-12-31T10:00",
-                "100",
-                "50"
-        );
+        adminEventsPage.createEvent(eventTitle, "trasky", "Concert",
+                "Test City", "Test Venue", "2026-11-21T11:56", "250", "200");
 
-       //Step 2 - Find newly created event in the events page
+        // Find the new event and book it
         EventsPage eventsPage = new EventsPage(page);
-       eventsPage.goTo();
-       Locator targetCard = eventsPage.findEventCard(eventTitle);
-       int seatsNumBeforeBooking = eventsPage.getSeatsCount(targetCard);
-       BookingFormPage bookingFormPage = eventsPage.proceedToBookingEvent(targetCard);
-       bookingFormPage.fillAndConfirm("Test Student",
-               "test.student@example.com",
-               "9876543210");
+        eventsPage.gotoEventsPage();
+        eventsPage.waitForEventsToLoad();
+        eventsPage.findEventsCard(eventTitle);
+        int seatNumberBeforeBooking = eventsPage.getSeatsCount();
+        Locator specificEvent = eventsPage.getSpecificEvent();
+        BookingFormPage bookingFormPage = eventsPage.proceedToBookingCardEvent();
 
+        bookingFormPage.numberOfSeatBooking(5);
+        bookingFormPage.BookingTicketForCustomer("Trasky", "trasky@gmail.com", "1234567890");
+        String bookingRef = bookingFormPage.verifyBookingDetails();
+        MyBookingDetails myBookingDetails = new MyBookingDetails(page);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-       //locators
-    }
-
-
-    @AfterMethod
-    public void tearDown()
-    {
-
+        // seat count deducted after booking
+//        eventsPage.gotoEventsPage();
+//        int seatCountAfter = eventsPage.getSeatsCount();
+//        System.out.println("Seat Count: " + seatNumberBeforeBooking);
+//        Assert.assertTrue(seatNumberBeforeBooking > seatCountAfter, "nothing is same");
+//        System.out.println("Seat Count Before Booking: " + seatNumberBeforeBooking);
+//        System.out.println("Seat Count After Booking: " + seatCountAfter);
 
     }
-
-
-
 
 
 }

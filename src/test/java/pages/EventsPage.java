@@ -6,49 +6,41 @@ import com.microsoft.playwright.Page;
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
 public class EventsPage {
-    Page page;
-    public EventsPage(Page page)
-    {
+    private final   Page page;
+    private Locator eventCards;
+    private Locator specificEvent;
+
+    public Locator getSpecificEvent() {
+        return specificEvent;
+    }
+
+    public EventsPage(Page page) {
         this.page = page;
     }
 
-    public void goTo()
-    {
+    public void gotoEventsPage() {
         page.locator("#nav-events").click();
     }
 
-    public Locator waitForEventsToLoad()
-    {
-        Locator eventCards = page.getByTestId("event-card"); //{loc1,loc2,loc3,loc4}
+    public void waitForEventsToLoad() {
+        eventCards = page.getByTestId("event-card");
         assertThat(eventCards.first()).isVisible();
-        return eventCards;
     }
 
-    public Locator findEventCard(String titleCard)
-    {
-        Locator eventCards =waitForEventsToLoad();
-        Locator targetCard = eventCards.filter(new Locator.FilterOptions().setHasText(titleCard));
-        assertThat(targetCard).isVisible();
-        return targetCard;
+    public void findEventsCard(String titleCard) {
+        specificEvent = eventCards.filter(new Locator.FilterOptions().setHasText(titleCard));
+        assertThat(specificEvent).isVisible();
     }
 
-    public int getSeatsCount(Locator targetCard)
-    {
-       // assertThat(targetCard).isVisible();
-
-        String seatsText =  targetCard.getByText("seats").innerText();
-        System.out.println(seatsText);
-        return Integer.parseInt(seatsText.split(" ")[0]);
+    public int getSeatsCount() {
+//        assertThat(specificEvent).isVisible(new LocatorAssertions.IsVisibleOptions().setTimeout(10000));
+        String seamount = specificEvent.getByText("seats").innerText();
+        System.out.println("Seat Count: " + seamount);
+        return Integer.parseInt(seamount.split(" ")[0]);
     }
-
-    public BookingFormPage proceedToBookingEvent(Locator targetCard)
-    {
-
-        targetCard.getByTestId("book-now-btn").click();
+    public BookingFormPage proceedToBookingCardEvent(){
+        specificEvent.getByTestId("book-now-btn").click();
         return new BookingFormPage(page);
-
     }
-
-
 
 }

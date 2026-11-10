@@ -11,19 +11,15 @@ import java.util.HashMap;
 import java.util.List;
 
 public class DataProviderUtil {
-
     public static Object[][] getJsonDataToMap(String filePath) throws IOException {
-        String jsonContent = new String(Files.readAllBytes(
-                Paths.get(System.getProperty("user.dir") + filePath)));
-
-        Type type = new TypeToken<List<HashMap<String, String>>>() {}.getType();
+        String jsonContent = new String(Files.readAllBytes(Paths.get(System.getProperty("user.dir") + filePath)));
+        Type type = new TypeToken<List<HashMap<String, String>>>() {
+        }.getType();
         List<HashMap<String, String>> list = new Gson().fromJson(jsonContent, type);
-
-        Object[][] table = new Object[list.size()][1];
+        Object[][] data = new Object[list.size()][1];
         for (int i = 0; i < list.size(); i++) {
-            table[i][0] = list.get(i);
+            data[i][0] = list.get(i);
         }
-        return table;
-
+        return data;
     }
 }

@@ -3,8 +3,11 @@ package tests;
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.options.AriaRole;
 import org.testng.Assert;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+
+import java.nio.file.Paths;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
@@ -20,9 +23,21 @@ public class MoreUIValidationsTest {
         browser=playwright.chromium().launch(new BrowserType.LaunchOptions().setHeadless(false));
 
         context = browser.newContext();
+
+        context.tracing().start(new Tracing.StartOptions()
+                .setScreenshots(true)
+                .setSnapshots(true)
+                .setSources(true));
         page = context.newPage();
         page.navigate("https://rahulshettyacademy.com/loginpagePractise/");
 
+    }
+
+             @AfterMethod()
+            public void tearDown()
+    {
+        context.tracing().stop(new Tracing.StopOptions()
+                .setPath(Paths.get("trace.zip")));
     }
 
     @Test
@@ -41,6 +56,15 @@ public class MoreUIValidationsTest {
       page.waitForTimeout(3000);
 
     }
+
+
+
+
+
+
+
+
+
 
 
     @Test(groups = {"smoke"})
