@@ -16,7 +16,7 @@ public class CrossBrowserTest {
        // Browser browser =playwright.webkit().launch(new BrowserType.LaunchOptions().setHeadless(false));
 
       //  Browser browser =playwright.firefox().launch(new BrowserType.LaunchOptions().setHeadless(false));
-        Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setChannel("chrome").setHeadless(false));
+        Browser browser = playwright.chromium().launch(new BrowserType.LaunchOptions().setChannel("chrome"));
         Page page = browser.newPage();
         page.navigate("https://eventhub.rahulshettyacademy.com/login");
         System.out.println(page.title());

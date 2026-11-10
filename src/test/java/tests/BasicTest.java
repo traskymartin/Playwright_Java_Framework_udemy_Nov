@@ -27,7 +27,7 @@ public class BasicTest {
     public void setUp() {
         Playwright playwright = Playwright.create();
         Browser browser = playwright.chromium().launch(
-                new BrowserType.LaunchOptions().setHeadless(false));
+                new BrowserType.LaunchOptions());
      context = browser.newContext();
         context.tracing().start(new Tracing.StartOptions()
                 .setScreenshots(true)

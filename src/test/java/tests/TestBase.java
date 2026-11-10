@@ -24,7 +24,7 @@ public class TestBase {
         }
         String browserName = System.getProperty("browser", prop.getProperty("browser", "chromium"));
         playwright = Playwright.create();
-        BrowserType.LaunchOptions launchOptions = new BrowserType.LaunchOptions().setHeadless(false);
+        BrowserType.LaunchOptions launchOptions = new BrowserType.LaunchOptions();
         if (browserName.equalsIgnoreCase("chrome") || browserName.equalsIgnoreCase("chromium")) {
             browser = playwright.chromium().launch(launchOptions);
         } else if (browserName.equalsIgnoreCase("firefox")) {

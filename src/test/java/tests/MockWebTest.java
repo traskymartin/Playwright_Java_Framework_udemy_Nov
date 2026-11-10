@@ -27,8 +27,7 @@ public class MockWebTest {
     @BeforeMethod(alwaysRun = true)
     public void setUp() {
         playwright = Playwright.create();
-        browser = playwright.chromium().launch(
-                new BrowserType.LaunchOptions().setHeadless(false));
+        browser = playwright.chromium().launch(new BrowserType.LaunchOptions());
         context = browser.newContext();
         context.tracing().start(new Tracing.StartOptions()
                 .setScreenshots(true)
