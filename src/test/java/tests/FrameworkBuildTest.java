@@ -13,7 +13,7 @@ import java.nio.file.Paths;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
-public class FrameWorkBuildTest extends TestBase {
+public class FrameworkBuildTest extends TestBase {
 
     @Test(description = " Create Event - Book that event and verify if its booked ")
     public void demotest() throws InterruptedException {

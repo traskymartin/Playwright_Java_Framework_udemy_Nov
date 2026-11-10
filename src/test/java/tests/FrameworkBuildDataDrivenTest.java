@@ -9,7 +9,7 @@ import utils.DataProviderUtil;
 import java.io.IOException;
 import java.util.HashMap;
 
-public class FrameWorkBuildDataDrivenTest extends TestBase {
+public class FrameworkBuildDataDrivenTest extends TestBase {
 
     @DataProvider(name = "eventBookingData")
     public Object[][] eventBookingData() throws IOException {
